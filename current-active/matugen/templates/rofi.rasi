@@ -1,0 +1,12 @@
+* {
+    primary: rgb({{colors.primary.default.red}}, {{colors.primary.default.green}}, {{colors.primary.default.blue}});
+    secondary: rgb({{colors.secondary.default.red}}, {{colors.secondary.default.green}}, {{colors.secondary.default.blue}});
+    tertiary: rgb({{colors.tertiary.default.red}}, {{colors.tertiary.default.green}}, {{colors.tertiary.default.blue}});
+    background: rgb({{colors.background.default.red}}, {{colors.background.default.green}}, {{colors.background.default.blue}});
+    surface: rgb({{colors.surface.default.red}}, {{colors.surface.default.green}}, {{colors.surface.default.blue}});
+    error: rgb({{colors.error.default.red}}, {{colors.error.default.green}}, {{colors.error.default.blue}});
+    outline: rgb({{colors.outline.default.red}}, {{colors.outline.default.green}}, {{colors.outline.default.blue}});
+    
+    bg-trans: rgba({{colors.background.default.red}}, {{colors.background.default.green}}, {{colors.background.default.blue}}, 0.85);
+    surface-trans: rgba({{colors.surface.default.red}}, {{colors.surface.default.green}}, {{colors.surface.default.blue}}, 0.75);
+}

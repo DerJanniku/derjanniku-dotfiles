@@ -1,0 +1,82 @@
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrainsMono Nerd Font", "Roboto", "Helvetica", "Arial", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    min-height: 0;
+}
+
+window#waybar {
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(211, 47, 47, 0.3);
+    border-radius: 16px;
+    color: #1a1a1a;
+    margin: 8px 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+#workspaces {
+    background: transparent;
+    margin: 4px;
+}
+
+#workspaces button {
+    padding: 0px 8px;
+    color: #d32f2f;
+    border-radius: 50%;
+    margin: 0px 4px;
+}
+
+#workspaces button.active {
+    background-color: #d32f2f;
+    color: #ffffff;
+}
+
+#workspaces button:hover {
+    background-color: rgba(211, 47, 47, 0.1);
+}
+
+#window {
+    font-weight: bold;
+    color: #1a1a1a;
+    margin-left: 10px;
+    font-size: 10px;
+}
+
+/* Konsistentes Spacing fuer alle Module rechts */
+#clock, #cpu, #memory, #network, #pulseaudio, #tray, #custom-music, #custom-power {
+    padding: 0 12px;
+    color: #1a1a1a;
+    background: transparent;
+    margin: 0px;
+    font-weight: 600;
+}
+
+#custom-music {
+    color: #444444;
+    font-size: 10px;
+}
+
+#clock {
+    font-size: 11px;
+    color: #1a1a1a;
+    margin-right: 5px;
+}
+
+#custom-power {
+    color: #d32f2f;
+    font-size: 14px;
+    margin-right: 10px;
+    padding-left: 10px;
+}
+
+#custom-power:hover {
+    background: #d32f2f;
+    color: #ffffff;
+    border-radius: 50%;
+}
+
+#tray {
+    padding: 0 8px;
+}

@@ -1,0 +1,67 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 32,
+    "spacing": 0,
+    "margin-top": 8,
+    "margin-left": 20,
+    "margin-right": 20,
+    "modules-left": [
+        "hyprland/workspaces",
+        "hyprland/window"
+    ],
+    "modules-center": [
+        "custom/music"
+    ],
+    "modules-right": [
+        "pulseaudio",
+        "network",
+        "cpu",
+        "memory",
+        "clock",
+        "tray",
+        "custom/power"
+    ],
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "on-click": "activate",
+        "format-icons": {
+            "active": "",
+            "default": ""
+        }
+    },
+    "custom/music": {
+        "format": "<span color='#7aa2f7'></span>  {}",
+        "escape": true,
+        "interval": 5,
+        "exec": "playerctl metadata --format '{{ title }} - {{ artist }}' || echo 'Silence'",
+        "max-length": 35
+    },
+    "clock": {
+        "format": "<span color='#7aa2f7'></span> {:%H:%M}"
+    },
+    "cpu": {
+        "format": "<span color='#7aa2f7'></span> {usage}%"
+    },
+    "memory": {
+        "format": "<span color='#7aa2f7'></span> {percentage}%"
+    },
+    "pulseaudio": {
+        "format": "<span color='#7aa2f7'>{icon}</span>  {volume}%",
+        "format-icons": {
+            "default": ["", "", ""]
+        }
+    },
+    "network": {
+        "format-wifi": "<span color='#7aa2f7'></span> {essid}",
+        "format-ethernet": "<span color='#7aa2f7'>󰈀</span> LAN"
+    },
+    "tray": {
+        "icon-size": 15,
+        "spacing": 10
+    },
+    "custom/power": {
+        "format": "",
+        "on-click": "wlogout"
+    }
+}

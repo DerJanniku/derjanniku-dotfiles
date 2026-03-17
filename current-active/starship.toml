@@ -1,0 +1,43 @@
+# --- Starship Modern Rounded White & Red ---
+format = """
+[](#d32f2f)\
+$os\
+$username\
+[](bg:#f5f5f5 fg:#d32f2f)\
+$directory\
+[](fg:#f5f5f5 bg:#444444)\
+$git_branch\
+$git_status\
+[](fg:#444444 bg:transparent)\
+$character"""
+
+[os]
+disabled = false
+style = "bg:#d32f2f fg:#ffffff"
+
+[username]
+show_always = true
+style_user = "bg:#d32f2f fg:#ffffff"
+format = '[$user]($style)'
+
+[directory]
+style = "bg:#f5f5f5 fg:#000000"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = " "
+style = "bg:#444444 fg:#ffffff"
+format = '[[ $symbol $branch ]($style)]'
+
+[git_status]
+style = "bg:#444444 fg:#ffffff"
+format = '[[($all_status$ahead_behind )]($style)]'
+
+[character]
+success_symbol = "[ 󰄬 ](bold fg:#d32f2f)"
+error_symbol = "[ 󰅖 ](bold fg:#ff0000)"
+
+[line_break]
+disabled = false

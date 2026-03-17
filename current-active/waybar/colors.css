@@ -1,0 +1,11 @@
+@define-color primary rgba(128, 212, 214, 1);
+@define-color primary-container rgba(0, 79, 81, 1);
+@define-color secondary rgba(176, 204, 204, 1);
+@define-color tertiary rgba(180, 200, 233, 1);
+@define-color error rgba(255, 180, 171, 1);
+@define-color background rgba(14, 20, 21, 1);
+@define-color surface rgba(14, 20, 21, 1);
+@define-color outline rgba(137, 147, 146, 1);
+
+@define-color bg-trans rgba(14, 20, 21, 0.45);
+@define-color primary-trans rgba(128, 212, 214, 0.25);

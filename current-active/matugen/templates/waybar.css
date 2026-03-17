@@ -1,0 +1,11 @@
+@define-color primary {{colors.primary.default.rgba}};
+@define-color primary-container {{colors.primary_container.default.rgba}};
+@define-color secondary {{colors.secondary.default.rgba}};
+@define-color tertiary {{colors.tertiary.default.rgba}};
+@define-color error {{colors.error.default.rgba}};
+@define-color background {{colors.background.default.rgba}};
+@define-color surface {{colors.surface.default.rgba}};
+@define-color outline {{colors.outline.default.rgba}};
+
+@define-color bg-trans rgba({{colors.background.default.red}}, {{colors.background.default.green}}, {{colors.background.default.blue}}, 0.45);
+@define-color primary-trans rgba({{colors.primary.default.red}}, {{colors.primary.default.green}}, {{colors.primary.default.blue}}, 0.25);

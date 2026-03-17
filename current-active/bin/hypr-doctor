@@ -1,0 +1,33 @@
+#!/bin/bash
+# Nexus Hyprland Doctor - Diagnostics Tool
+
+LOG_FILE="$HOME/.cache/hypr_config_errors.log"
+mkdir -p "$(dirname "$LOG_FILE")"
+
+echo "=== HYPRLAND DIAGNOSTICS ($(date)) ===" > "$LOG_FILE"
+
+# 1. Check for Config Errors
+ERRORS=$(hyprctl configerrors)
+if [ "$ERRORS" == "no errors found" ] || [ -z "$ERRORS" ]; then
+    echo "[OK] Hyprland Configuration: No errors." >> "$LOG_FILE"
+else
+    echo "[ERROR] Hyprland Configuration:" >> "$LOG_FILE"
+    echo "$ERRORS" >> "$LOG_FILE"
+fi
+
+# 2. Check Background Services
+check_service() {
+    if pgrep -x "$1" > /dev/null; then
+        echo "[OK] Service '$1' is running." >> "$LOG_FILE"
+    else
+        echo "[WARN] Service '$1' is NOT running." >> "$LOG_FILE"
+    fi
+}
+
+check_service "hyprpaper"
+check_service "waybar"
+check_service "swww-daemon"
+check_service "mpvpaper"
+
+# Output to console for Gemini
+cat "$LOG_FILE"

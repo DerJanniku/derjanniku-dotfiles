@@ -1,0 +1,19 @@
+# --- Legacy Dark Glass Starship ---
+format = "$os $username $directory $git_branch $git_status $character"
+
+[os]
+disabled = false
+style = "bold blue"
+
+[username]
+show_always = true
+style_user = "bold blue"
+format = "[$user]($style) "
+
+[directory]
+style = "bold cyan"
+format = "[$path]($style) "
+
+[character]
+success_symbol = "[➜](bold green)"
+error_symbol = "[➜](bold red)"

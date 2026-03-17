@@ -1,0 +1,102 @@
+/**
+ * Wallpaper Selector Theme (Professional Sidebar Mode)
+ * Layout: Links vertikale Liste (Scrollbar), Rechts riesige Vorschau
+ */
+
+* {
+    font: "JetBrainsMono NF 11";
+    bg: #11111b;
+    fg: #cdd6f4;
+    accent: #89b4fa;
+    selected: #313244;
+}
+
+window {
+    width: 90%;
+    height: 80%;
+    background-color: @bg;
+    border: 2px;
+    border-color: @accent;
+    border-radius: 12px;
+    padding: 0px;
+    orientation: horizontal;
+    children: [ mainbox ];
+}
+
+mainbox {
+    background-color: transparent;
+    orientation: horizontal;
+    children: [ list-container, preview-container ];
+}
+
+/* Linker Teil: Liste */
+list-container {
+    width: 30%;
+    background-color: #181825;
+    padding: 20px;
+    children: [ inputbar, listview ];
+}
+
+/* Rechter Teil: Vorschau (In Rofi ist das Icon Teil des Elements) */
+preview-container {
+    width: 70%;
+    background-color: transparent;
+    children: [ ]; /* Platzhalter */
+}
+
+inputbar {
+    background-color: @selected;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 0 0 10px 0;
+    children: [ prompt, entry ];
+}
+
+prompt { background-color: transparent; text-color: @accent; }
+entry { background-color: transparent; text-color: @fg; }
+
+listview {
+    background-color: transparent;
+    columns: 1;
+    lines: 15;
+    spacing: 5px;
+    scrollbar: true;
+    cycle: true;
+}
+
+scrollbar {
+    handle-width: 4px;
+    handle-color: @accent;
+    padding: 0 0 0 10px;
+}
+
+element {
+    background-color: transparent;
+    text-color: @fg;
+    orientation: horizontal; /* Icon RECHTS vom Text, wir machen es aber RECHTS im Screen */
+    padding: 10px;
+    border-radius: 8px;
+    children: [ element-text, dummy, element-icon ];
+}
+
+dummy {
+    expand: true; /* Schiebt das Icon nach rechts */
+    background-color: transparent;
+}
+
+element-text {
+    background-color: transparent;
+    text-color: inherit;
+    vertical-align: 0.5;
+    width: 100%;
+}
+
+element-icon {
+    size: 600px; /* RIESIG auf der rechten Seite */
+    padding: 0 20px 0 20px;
+}
+
+element selected {
+    background-color: @selected;
+    text-color: @accent;
+}

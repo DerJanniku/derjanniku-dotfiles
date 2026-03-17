@@ -1,0 +1,86 @@
+/* TOKYO NIGHT GLASSMORPHISM WAYBAR */
+
+* {
+    font-family: "JetBrainsMono Nerd Font", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+window#waybar {
+    background-color: transparent;
+    color: #c0caf5;
+    transition-property: background-color;
+    transition-duration: .5s;
+}
+
+window#waybar.hidden {
+    opacity: 0.2;
+}
+
+#workspaces button {
+    padding: 0 5px;
+    background-color: transparent;
+    color: #7aa2f7;
+    margin: 0 2px;
+}
+
+#workspaces button:hover {
+    background: rgba(122, 162, 247, 0.2);
+    box-shadow: inherit;
+    color: #c0caf5;
+}
+
+#workspaces button.active {
+    background-color: transparent;
+    color: #7aa2f7;
+    text-decoration: underline;
+}
+
+#custom-music {
+    color: #bb9af7;
+    padding: 0 15px;
+}
+
+window#waybar.empty #window {
+    background-color: transparent;
+    border: none;
+}
+
+#clock,
+#cpu,
+#memory,
+#pulseaudio,
+#network,
+#tray,
+#custom-power,
+#window {
+    padding: 0 10px;
+    margin: 0 5px;
+    background-color: rgba(65, 72, 104, 0.25); /* Etwas stärker */
+    border: 1px solid rgba(122, 162, 247, 0.15);
+    border-radius: 12px; /* Runder */
+}
+
+#clock {
+    color: #7dcfff;
+}
+
+#cpu {
+    color: #f7768e;
+}
+
+#memory {
+    color: #9ece6a;
+}
+
+#pulseaudio {
+    color: #e0af68;
+}
+
+#network {
+    color: #7aa2f7;
+}
+
+#tray {
+    background-color: transparent;
+}

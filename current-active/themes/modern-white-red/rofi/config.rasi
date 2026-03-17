@@ -1,0 +1,128 @@
+configuration {
+    modi:                       "drun,run";
+    show-icons:                 true;
+    display-drun:               " ";
+    display-run:                " ";
+    drun-display-format:        "{name}";
+}
+
+* {
+    font:                        "JetBrainsMono Nerd Font 12";
+    bg-color:                    #ffffff;
+    bg-alt:                      #f5f5f5;
+    fg-color:                    #000000;
+    accent-color:                #d32f2f;
+}
+
+window {
+    transparency:                "real";
+    location:                    center;
+    anchor:                      center;
+    fullscreen:                  false;
+    width:                       600px;
+    x-offset:                    0px;
+    y-offset:                    0px;
+
+    enabled:                     true;
+    margin:                      0px;
+    padding:                     0px;
+    border:                      3px solid;
+    border-radius:               15px;
+    border-color:                @accent-color;
+    background-color:            @bg-color;
+    cursor:                      "default";
+}
+
+mainbox {
+    enabled:                     true;
+    spacing:                     0px;
+    margin:                      0px;
+    padding:                     0px;
+    border:                      0px solid;
+    border-radius:               15px;
+    border-color:                @accent-color;
+    background-color:            transparent;
+    children:                    [ "inputbar", "listview" ];
+}
+
+inputbar {
+    enabled:                     true;
+    spacing:                     10px;
+    margin:                      0px;
+    padding:                     15px;
+    border:                      0px 0px 2px 0px;
+    border-radius:               15px 15px 0px 0px;
+    border-color:                @accent-color;
+    background-color:            @bg-color;
+    text-color:                  @fg-color;
+    children:                    [ "prompt", "entry" ];
+}
+
+prompt {
+    enabled:                     true;
+    background-color:            transparent;
+    text-color:                  @accent-color;
+}
+
+entry {
+    enabled:                     true;
+    background-color:            transparent;
+    text-color:                  inherit;
+    cursor:                      "text";
+    placeholder:                 "Search Apps...";
+    placeholder-color:           inherit;
+}
+
+listview {
+    enabled:                     true;
+    columns:                     1;
+    lines:                       8;
+    cycle:                       true;
+    dynamic:                     true;
+    scrollbar:                   false;
+    layout:                      vertical;
+    reverse:                     false;
+    fixed-height:                true;
+    fixed-columns:               true;
+    
+    spacing:                     5px;
+    margin:                      0px;
+    padding:                     10px;
+    border:                      0px solid;
+    background-color:            transparent;
+    text-color:                  @fg-color;
+    cursor:                      "default";
+}
+
+element {
+    enabled:                     true;
+    spacing:                     10px;
+    margin:                      0px;
+    padding:                     8px;
+    border:                      0px solid;
+    border-radius:               10px;
+    background-color:            transparent;
+    text-color:                  @fg-color;
+    cursor:                      "pointer";
+}
+
+element selected.normal {
+    background-color:            @accent-color;
+    text-color:                  #ffffff;
+}
+
+element-icon {
+    background-color:            transparent;
+    text-color:                  inherit;
+    size:                        32px;
+    cursor:                      inherit;
+}
+
+element-text {
+    background-color:            transparent;
+    text-color:                  inherit;
+    highlight:                   inherit;
+    cursor:                      inherit;
+    vertical-align:              0.5;
+    horizontal-align:            0.0;
+}

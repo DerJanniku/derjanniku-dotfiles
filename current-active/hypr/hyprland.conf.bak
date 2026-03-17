@@ -1,0 +1,136 @@
+# --- Hyprland Config for ArchSwitch ---
+# Premium 3-Monitor Setup with Professional Glassmorphism
+
+$mod=SUPER
+$browser = firefox
+
+# --- Input Settings ---
+input {
+    kb_layout=de
+    follow_mouse=1
+    sensitivity=0 
+    touchpad {
+        natural_scroll=no
+    }
+}
+
+# --- General settings ---
+general {
+    gaps_in=3
+    gaps_out=5
+    border_size=1
+    col.active_border=0xffbbbbbb
+    col.inactive_border=0xff333333
+    layout=dwindle
+}
+
+# --- Window decoration ---
+decoration {
+    rounding=3
+    active_opacity = 1.0
+    inactive_opacity = 1.0
+    blur {
+        enabled=true
+        size=5
+        passes=3
+        new_optimizations = true
+        ignore_opacity = true
+    }
+}
+
+# --- Animations ---
+animations {
+    enabled=1
+    animation=windows, 1, 7, default
+    animation=fade, 1, 7, default
+    animation=workspaces, 1, 7, default
+}
+
+
+
+# --- Application Launchers & System ---
+bind=$mod,Return,exec,kitty
+bind=$mod,B,exec,$browser
+bind=$mod,I,exec,kwrite
+bind=$mod,SPACE,exec,rofi -show drun -config ~/.config/rofi/config.rasi -sorting-method fzf -matching fuzzy
+bind = $mod, W, exec, $HOME/.config/rofi/wallpaper-launcher.sh
+bind=$mod,Q,killactive,
+bind=$mod,M,exit,
+bind=$mod,E,exec,dolphin
+bind=$mod SHIFT,S,exec,bash -c 'grim -g "$(slurp)" - | wl-copy && notify-send "Screenshot" "Region copied to clipboard"'
+
+# --- Window Management ---
+bind=$mod,Left,focuswindow,l
+bind=$mod,Right,focuswindow,r
+bind=$mod,Up,focuswindow,u
+bind=$mod,Down,focuswindow,d
+bind=$mod SHIFT,Left,swapwindow,l
+bind=$mod SHIFT,Right,swapwindow,r
+bind=$mod SHIFT,Up,swapwindow,u
+bind=$mod SHIFT,Down,swapwindow,d
+bind=$mod CONTROL SHIFT,Left,movewindow,l
+bind=$mod CONTROL SHIFT,Right,movewindow,r
+bind=$mod CONTROL SHIFT,Up,movewindow,u
+bind=$mod CONTROL SHIFT,Down,movewindow,d
+bind=$mod,P,togglesplit,
+bind=$mod,V,togglefloating,
+bind=$mod,F,fullscreen,
+
+# --- Workspace Management ---
+bind=$mod,1,workspace,1
+bind=$mod,2,workspace,2
+bind=$mod,3,workspace,3
+bind=$mod,4,workspace,4
+bind=$mod,5,workspace,5
+bind=$mod SHIFT,1,movetoworkspace,1
+bind=$mod SHIFT,2,movetoworkspace,2
+bind=$mod SHIFT,3,movetoworkspace,3
+
+# --- Mouse Bindings ---
+bindm = $mod, mouse:272, movewindow
+bindm = $mod, mouse:273, resizewindow
+
+# --- Media & Brightness ---
+bindl=,XF86AudioPlay,exec,playerctl play-pause
+bindle=,XF86AudioRaiseVolume,exec,pactl set-sink-volume @DEFAULT_SINK@ +5%
+bindle=,XF86AudioLowerVolume,exec,pactl set-sink-volume @DEFAULT_SINK@ -5%
+bindle=,XF86MonBrightnessUp,exec,brightnessctl set +10%
+bindle=,XF86MonBrightnessDown,exec,brightnessctl set 10%-
+
+# --- Environment Variables ---
+env = XCURSOR_SIZE,24
+env = QT_QPA_PLATFORMTHEME,qt5ct
+
+# --- Monitor Configuration ---
+# Vertical Left (DP-2)
+monitor = DP-2, 1920x1080@60, 0x0, 1
+workspace = 1, monitor:DP-2
+workspace = 2, monitor:DP-2
+workspace = 3, monitor:DP-2
+
+# Gigabyte Middle (DP-1)
+# Gigabyte Middle (DP-1)
+monitor = DP-1, 2560x1440@200, 1920x0, 1.33
+workspace = 4, monitor:DP-1
+workspace = 5, monitor:DP-1
+workspace = 6, monitor:DP-1
+
+# HDMI Right (HDMI-A-1)
+# HDMI Right (HDMI-A-1)
+# HDMI Right (HDMI-A-1)
+monitor = HDMI-A-1, 1920x1080@60, auto, 1
+workspace = 7, monitor:HDMI-A-1
+workspace = 8, monitor:HDMI-A-1
+workspace = 9, monitor:HDMI-A-1
+
+# --- Startup ---
+exec-once = ~/.config/hypr/scripts/xdg-portal-hyprland
+exec-once = waybar
+exec-once = swww-daemon
+exec-once = vesktop --use-gl=wayland --enable-features=UseOzonePlatform --ozone-platform=wayland --start-minimized
+
+
+# --- XWayland Fix ---
+xwayland {
+    force_zero_scaling = true
+}

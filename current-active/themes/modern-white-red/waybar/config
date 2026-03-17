@@ -1,0 +1,81 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 32,
+    "spacing": 0,
+    "margin-top": 8,
+    "margin-left": 20,
+    "margin-right": 20,
+    "modules-left": [
+        "hyprland/workspaces",
+        "hyprland/window"
+    ],
+    "modules-center": [
+        "custom/music"
+    ],
+    "modules-right": [
+        "pulseaudio",
+        "network",
+        "cpu",
+        "memory",
+        "clock",
+        "tray",
+        "custom/power"
+    ],
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "on-click": "activate",
+        "format-icons": {
+            "active": "",
+            "default": ""
+        },
+        "sort-by-number": true
+    },
+    "hyprland/window": {
+        "format": "{}",
+        "max-length": 30,
+        "separate-outputs": true
+    },
+    "custom/music": {
+        "format": "<span color='#d32f2f'></span>  {}",
+        "escape": true,
+        "interval": 5,
+        "exec": "playerctl metadata --format '{{ title }} - {{ artist }}' || echo 'Silence'",
+        "on-click": "playerctl play-pause",
+        "max-length": 35
+    },
+    "clock": {
+        "format": "<span color='#d32f2f'></span> {:%H:%M}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+    "cpu": {
+        "format": "<span color='#d32f2f'></span> {usage}%",
+        "interval": 2
+    },
+    "memory": {
+        "format": "<span color='#d32f2f'></span> {percentage}%",
+        "interval": 2
+    },
+    "pulseaudio": {
+        "format": "<span color='#d32f2f'>{icon}</span>  {volume}%",
+        "format-muted": "<span color='#d32f2f'></span> Muted",
+        "format-icons": {
+            "default": ["", "", ""]
+        },
+        "on-click": "pavucontrol"
+    },
+    "network": {
+        "format-wifi": "<span color='#d32f2f'></span> {essid}",
+        "format-ethernet": "<span color='#d32f2f'>󰈀</span> LAN",
+        "format-disconnected": "<span color='#d32f2f'>⚠</span> Offline",
+        "tooltip-format": "{ifname} via {gwaddr}"
+    },
+    "tray": {
+        "icon-size": 15,
+        "spacing": 10
+    },
+    "custom/power": {
+        "format": "",
+        "on-click": "wlogout"
+    }
+}

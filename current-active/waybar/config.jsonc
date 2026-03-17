@@ -1,0 +1,92 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 30,
+    "spacing": 4,
+    "margin-top": 0,
+    "margin-left": 0,
+    "margin-right": 0,
+    "modules-left": [
+        "hyprland/workspaces",
+        "hyprland/window"
+    ],
+    "modules-center": [
+        "custom/music"
+    ],
+    "modules-right": [
+        "pulseaudio",
+        "network",
+        "cpu",
+        "memory",
+        "clock",
+        "tray",
+        "custom/power"
+    ],
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "on-click": "activate",
+        "format-icons": {
+            "1": "",
+            "2": "",
+            "3": "",
+            "4": "",
+            "5": "",
+            "urgent": "",
+            "focused": "",
+            "default": ""
+        },
+        "sort-by-number": true
+    },
+    "hyprland/window": {
+        "format": "{}",
+        "max-length": 35,
+        "separate-outputs": true
+    },
+    "custom/music": {
+        "format": "<span color='#d32f2f'></span>  {}",
+        "escape": true,
+        "interval": 5,
+        "exec": "playerctl metadata --format '{{ title }} - {{ artist }}' || echo 'Silence'",
+        "on-click": "playerctl play-pause",
+        "max-length": 40,
+        "tooltip": true
+    },
+    "clock": {
+        "format": "<span color='#d32f2f'></span> {:%H:%M  <span color='#d32f2f'></span> %d.%m.%Y}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+    "cpu": {
+        "format": "<span color='#d32f2f'></span> {usage}%",
+        "tooltip": false,
+        "interval": 2
+    },
+    "memory": {
+        "format": "<span color='#d32f2f'></span> {}%",
+        "interval": 2
+    },
+    "pulseaudio": {
+        "format": "<span color='#d32f2f'>{icon}</span> {volume}%",
+        "format-muted": "<span color='#d32f2f'></span> Muted",
+        "format-icons": {
+            "default": ["", "", ""]
+        },
+        "on-click": "pavucontrol",
+        "scroll-step": 5
+    },
+    "network": {
+        "format-wifi": "<span color='#d32f2f'></span> {essid}",
+        "format-ethernet": "<span color='#d32f2f'></span> Wired",
+        "format-disconnected": "<span color='#d32f2f'>⚠</span> Offline",
+        "tooltip-format": "{ifname} via {gwaddr}",
+        "format-linked": "{ifname} (No IP)"
+    },
+    "tray": {
+        "icon-size": 16,
+        "spacing": 10
+    },
+    "custom/power": {
+        "format": "",
+        "on-click": "wlogout",
+        "tooltip": false
+    }
+}

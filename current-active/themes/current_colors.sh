@@ -1,0 +1,5 @@
+ACCENT="#7aa2f7"
+BG="rgba(26, 27, 38, 0.85)"
+FG="#c0caf5"
+BRADIUS="16px"
+BWIDTH="2px"

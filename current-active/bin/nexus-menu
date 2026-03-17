@@ -1,0 +1,84 @@
+#!/bin/bash
+# --- Nexus Command Center v7.3 ---
+# FULL Dynamic Color Consistency
+
+# Robust Defaults
+ACCENT="#d32f2f"; BG="#ffffff"; FG="#1a1a1a"; BWIDTH="2px"; BRADIUS="12px"
+
+CURRENT_COLORS="$HOME/.config/themes/current_colors.sh"
+[ -f "$CURRENT_COLORS" ] && source "$CURRENT_COLORS"
+
+ACCENT=${ACCENT:-"#d32f2f"}; BG=${BG:-"#ffffff"}; FG=${FG:-"#1a1a1a"}; BWIDTH=${BWIDTH:-"2px"}; BRADIUS=${BRADIUS:-"12px"}
+
+# Hier werden ALLE Elemente explizit gefaerbt
+ROFI_CONF="window { width: 350px; border: $BWIDTH; border-radius: $BRADIUS; border-color: $ACCENT; background-color: $BG; } 
+           mainbox { border-radius: $BRADIUS; }
+           inputbar { border-color: $ACCENT; text-color: $FG; }
+           prompt { text-color: $ACCENT; }
+           entry { text-color: $FG; }
+           listview { text-color: $FG; }
+           element { text-color: $FG; }
+           element selected.normal { background-color: $ACCENT; text-color: #ffffff; }"
+
+submenu() {
+  local result
+  result=$(echo -e "$2" | rofi -dmenu -i -p "$1" -name "rofi-static" -theme-str "$ROFI_CONF")
+  echo "$result"
+}
+
+app_menu() {
+  case $(submenu "󰀻 Apps" "󰈹  Browser\n󰆍  Terminal\n󰅩  Code Editor\n󰉋  File Manager") in
+  *Browser*)     firefox & exit 0 ;;
+  *Terminal*)    kitty & exit 0 ;;
+  *Editor*)      kwrite & exit 0 ;;
+  *Manager*)     dolphin & exit 0 ;;
+  esac
+}
+
+style_menu() {
+  case $(submenu "🎨 Style" "🎨  Theme Switcher\n󰸉  Wallpaper Picker\n󱎗  Toggle Waybar") in
+  *Switcher*)     ~/.config/rofi/theme-switcher.sh & exit 0 ;;
+  *Picker*)       ~/.config/rofi/wallpaper-launcher.sh & exit 0 ;;
+  *Waybar*)       pkill -USR1 waybar && exit 0 ;;
+  esac
+}
+
+comms_menu() {
+  case $(submenu "󰭟 Comms" "󰙯  Discord\n󰍡  WhatsApp\n󰇰  Mail") in
+  *Discord*)   vesktop & exit 0 ;;
+  *WhatsApp*)  firefox --new-window https://web.whatsapp.com & exit 0 ;;
+  esac
+}
+
+system_menu() {
+  case $(submenu "󰄶 System" "󰑐  Reload Hyprland\n󰃭  Calendar\n󰈀  Network Settings") in
+  *Reload*)   hyprctl reload && exit 0 ;;
+  *Settings*) nm-connection-editor & exit 0 ;;
+  esac
+}
+
+power_menu() {
+  case $(submenu "󰐥 Power" "🔒  Lock\n󰍃  Logout\n󰑐  Reboot\n󰐥  Shutdown") in
+  *Lock*)     hyprlock & exit 0 ;;
+  *Logout*)   hyprctl dispatch exit ;;
+  *Reboot*)   reboot ;;
+  *Shutdown*) shutdown now ;;
+  esac
+}
+
+main_menu() {
+  while true; do
+    selected=$(echo -e "󰀻  Apps\n🎨  Style\n󰭟  Communication\n󰄶  System\n󰐥  Power" \
+               | rofi -dmenu -i -p "󱓞 Nexus" -theme-str "$ROFI_CONF")
+    [[ -z "$selected" ]] && exit 0
+    case "$selected" in
+    *Apps*)          app_menu ;;
+    *Style*)         style_menu ;;
+    *Communication*) comms_menu ;;
+    *System*)        system_menu ;;
+    *Power*)         power_menu ;;
+    esac
+  done
+}
+
+main_menu

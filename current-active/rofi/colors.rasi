@@ -1,0 +1,12 @@
+* {
+    primary: rgb(128, 212, 214);
+    secondary: rgb(176, 204, 204);
+    tertiary: rgb(180, 200, 233);
+    background: rgb(14, 20, 21);
+    surface: rgb(14, 20, 21);
+    error: rgb(255, 180, 171);
+    outline: rgb(137, 147, 146);
+    
+    bg-trans: rgba(14, 20, 21, 0.85);
+    surface-trans: rgba(14, 20, 21, 0.75);
+}
