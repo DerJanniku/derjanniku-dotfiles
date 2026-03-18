@@ -5,19 +5,37 @@
 
 My personal, high-performance desktop environment for Arch Linux. Built on Hyprland with a focus on aesthetics, productivity, and seamless theme-switching.
 
+## Technical Specifications
+
+| Component | Implementation |
+| :--- | :--- |
+| **Window Manager** | Hyprland (v0.45.2+) |
+| **Status Bar** | Waybar (custom CSS/JS) |
+| **Launcher** | Rofi (wayland-fork) |
+| **Color Engine** | Matugen (Dynamic Image-to-Color) |
+| **Terminal** | Kitty |
+| **Shell** | ZSH + Starship |
+| **Fonts** | JetBrains Mono Nerd Font |
+| **Notifications** | Mako |
+
 ## Features
 
-- **Integrated Voice Dictation (VibeFlow)**: My custom-built voice-to-text engine, seamlessly integrated into the workflow.
-- **Dynamic Theme Engine**: Switch between multiple professional styles (Dark, Light, Glassmorphism) on the fly.
-- **Floating Capsule UI**: A modern, clean interface with a minimalist Waybar and Rofi integration.
-- **Workflow Focused**: Optimized for development and daily driving with custom window management and hotkeys.
-- **Easy Setup**: Modular installation script to get you up and running quickly.
+- **Integrated Voice Dictation (VibeFlow)**: Custom voice-to-text engine integration.
+- **Dynamic Theming**: matugen-powered color generation on wallpaper change.
+- **Showcase Mode**: Automated workspace orchestration for presentation.
 
-## Custom Tools & Dashboards
+## Usage
 
-### Professional Wallpaper Dashboard (`Meta + W`)
-A custom-built Python/GTK3 dashboard to manage the wallpaper gallery with a sidebar list and high-quality real-time preview. Includes smart search and native support for JPG, PNG, GIFs, and MP4 videos.
+### Showcase Mode (`Meta + S`)
+To instantly launch a professional demonstration layout (fastfetch, cava, nvim), run:
+```bash
+hypr-showcase
+```
+
+### Wallpaper Dashboard (`Meta + W`)
+Python/GTK3 dashboard for real-time wallpaper management and live previews.
 ![Wallpaper Dashboard](screenshots/wallpaper-dashboard.png)
+
 
 ### App Launcher (`Meta + D`)
 A clean, focused launcher for all installed applications.

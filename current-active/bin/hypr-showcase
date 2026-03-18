@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# hypr-showcase - automated environment orchestration
+# ==============================================================================
+# orchestrates a presentation layout on workspace 9.
+
+ws=9
+
+# dependency check
+dependencies=("fastfetch" "cava" "nvim")
+for cmd in "${dependencies[@]}"; do
+    if ! command -v "$cmd" &> /dev/null; then
+        echo "error: $cmd not found. install it for full showcase functionality."
+    fi
+done
+
+# switch to workspace
+hyprctl dispatch workspace $ws
+
+# terminal orchestrator (kitty)
+# layout: [fetch] [cava]
+#         [     nvim    ]
+
+# 1. system info
+hyprctl dispatch exec "[workspace $ws;float;size 600 400;move 50 80] kitty --title showcase-fetch sh -c 'fastfetch; exec zsh'"
+
+# 2. visualizer
+hyprctl dispatch exec "[workspace $ws;float;size 800 300;move 700 80] kitty --title showcase-cava cava"
+
+# 3. editor
+hyprctl dispatch exec "[workspace $ws;float;size 1450 550;move 50 530] kitty --title showcase-nvim nvim"
+
+echo "showcase orchestrated on workspace $ws."
