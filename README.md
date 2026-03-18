@@ -74,3 +74,12 @@ Trigger the dynamic theme switcher at any time:
 
 ## License
 MIT License. Created by DerJanniku.
+## Star History
+
+<a href="https://star-history.com/#DerJanniku/derjanniku-dotfiles&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=DerJanniku/derjanniku-dotfiles&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=DerJanniku/derjanniku-dotfiles&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=DerJanniku/derjanniku-dotfiles&type=Date" />
+  </picture>
+</a>
