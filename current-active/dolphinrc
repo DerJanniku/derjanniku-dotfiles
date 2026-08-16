@@ -1,0 +1,54 @@
+[CompactMode]
+PreviewSize=22
+
+[DetailsMode]
+HighlightEntireRow=true
+IconSize=22
+PreviewSize=22
+
+[General]
+AutoExpandFolders=false
+BrowseThroughArchives=true
+ConfirmClosingMultipleTabs=false
+GlobalViewProps=true
+OpenExternallyCalledFolderInNewTab=true
+RememberOpenedTabs=false
+ShowFullPath=false
+ShowFullPathInTitlebar=true
+ShowInformationPanel=false
+ShowSelectionToggle=false
+ShowStatusBar=true
+Version=202
+ViewPropsTimestamp=2026,8,16,15,26,00.0
+
+[IconsMode]
+IconSize=64
+MaximumTextLines=2
+PreviewSize=96
+
+[InformationPanel]
+dateFormat=ShortFormat
+
+[KFileDialog Settings]
+Places Icons Auto-resize=false
+Places Icons Static Size=22
+
+[MainWindow]
+MenuBar=Disabled
+ToolBarsMovable=Disabled
+
+[MainWindow][Toolbar mainToolBar]
+IconSize=22
+ToolButtonStyle=IconOnly
+
+[PlacesPanel]
+IconSize=22
+
+[PreviewSettings]
+Plugins=appimagethumbnail,audiothumbnail,comicbookthumbnail,cursorthumbnail,djvuthumbnail,ebookthumbnail,exrthumbnail,imagethumbnail,jpegthumbnail,kraorathumbnail,windowsexethumbnail,windowsimagethumbnail,opendocumentthumbnail,svgthumbnail,ffmpegthumbs,fontthumbnail
+
+[Toolbar mainToolBar]
+ToolButtonStyle=IconOnly
+
+[UiSettings]
+ColorScheme=BreezeDark
