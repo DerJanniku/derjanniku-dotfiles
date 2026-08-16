@@ -30,15 +30,15 @@ disable_gamemode() {
         keyword decoration:shadow:enabled 1;\
         keyword decoration:blur:enabled 0;\
         keyword decoration:rounding 15;\
-        keyword decoration:active_opacity 0.90;\
-        keyword decoration:inactive_opacity 0.80;\
+        keyword decoration:active_opacity 0.98;\
+        keyword decoration:inactive_opacity 0.90;\
         keyword general:gaps_in 6;\
         keyword general:gaps_out 12;\
         keyword general:border_size 3;\
         keyword misc:vrr 1" > /dev/null 2>&1
     hyprctl reload > /dev/null 2>&1
 
-    notify-send -a "GameMode" "✨ Desktop Ästhetik-Modus" "Wiederhergestellt: Klare Transparenz & Animationen aktiv." -t 2000 -i "preferences-desktop-theme"
+    notify-send -a "GameMode" "✨ Desktop Ästhetik-Modus" "Wiederhergestellt: Solide Lesbarkeit & Animationen aktiv." -t 2000 -i "preferences-desktop-theme"
     pkill -SIGRTMIN+8 waybar 2>/dev/null || true
 }
 
