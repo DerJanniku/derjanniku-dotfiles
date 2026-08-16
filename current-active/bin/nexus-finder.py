@@ -3,6 +3,8 @@
 ==============================================================================
 Nexus Finder - Bespoke Next-Gen File Manager for Arch Linux & Hyprland
 Author: DerJannik
+Features: Dynamic Theming, SSHFS Server Mounts, 1-Click Client File Dispatch,
+          Drag & Drop to Browser/Discord, Quick Share Link & Previews
 ==============================================================================
 """
 
@@ -12,6 +14,8 @@ import subprocess
 import shutil
 import mimetypes
 import datetime
+import threading
+import urllib.parse
 import gi
 
 gi.require_version('Gtk', '3.0')
@@ -89,13 +93,29 @@ def get_file_icon_name(path, is_dir):
         return "video-x-generic"
     elif ext in [".mp3", ".flac", ".ogg", ".wav", ".m4a"]:
         return "audio-x-generic"
-    elif ext in [".zip", ".tar", ".gz", ".xz", ".7z", ".rar"]:
+    elif ext in [".zip", ".tar", ".gz", ".xz", ".7z", ".rar", ".jar"]:
         return "package-x-generic"
-    elif ext in [".py", ".sh", ".js", ".ts", ".rs", ".go", ".cpp", ".c", ".h", ".java", ".json", ".yaml", ".yml", ".toml", ".css", ".html"]:
+    elif ext in [".py", ".sh", ".js", ".ts", ".rs", ".go", ".cpp", ".c", ".h", ".java", ".json", ".yaml", ".yml", ".toml", ".css", ".html", ".md"]:
         return "text-x-script"
     elif ext in [".pdf"]:
         return "application-pdf"
     return "text-x-generic"
+
+def parse_ssh_hosts():
+    hosts = []
+    ssh_config = os.path.expanduser("~/.ssh/config")
+    if os.path.isfile(ssh_config):
+        try:
+            with open(ssh_config, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith("Host ") and not "*" in line:
+                        h = line.split()[1]
+                        if h not in hosts:
+                            hosts.append(h)
+        except Exception:
+            pass
+    return hosts
 
 # -----------------------------------------------------------------------------
 # Nexus Finder Window
@@ -105,7 +125,7 @@ class NexusFinder(Gtk.Window):
         super().__init__(type=Gtk.WindowType.TOPLEVEL)
         self.set_name("NexusFinder")
         self.set_title("Nexus Finder")
-        self.set_default_size(1080, 680)
+        self.set_default_size(1120, 700)
         self.set_position(Gtk.WindowPosition.CENTER)
         
         self.current_path = os.path.abspath(initial_path or os.path.expanduser("~"))
@@ -113,6 +133,7 @@ class NexusFinder(Gtk.Window):
         self.history_idx = 0
         self.show_hidden = False
         self.search_filter = ""
+        self.selected_path = None
         self.icon_theme = Gtk.IconTheme.get_default()
 
         # Apply Dynamic CSS Styling
@@ -130,9 +151,9 @@ class NexusFinder(Gtk.Window):
         content_hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
         root_vbox.pack_start(content_hbox, True, True, 0)
 
-        # Left Sidebar (Places & Favorites)
-        sidebar = self.create_sidebar()
-        content_hbox.pack_start(sidebar, False, False, 0)
+        # Left Sidebar (Places, Favorites & SSH Servers)
+        self.sidebar = self.create_sidebar()
+        content_hbox.pack_start(self.sidebar, False, False, 0)
 
         # Center File List / Grid View
         self.files_box = self.create_files_view()
@@ -175,7 +196,7 @@ class NexusFinder(Gtk.Window):
                 background-color: {c['sidebar_bg']};
                 border-right: 1px solid {c['border']};
                 padding: 12px 8px;
-                min-width: 210px;
+                min-width: 220px;
             }}
             .sidebar-category {{
                 font-size: 10px;
@@ -185,7 +206,7 @@ class NexusFinder(Gtk.Window):
                 letter-spacing: 1px;
             }}
             .sidebar-item {{
-                padding: 7px 10px;
+                padding: 6px 10px;
                 border-radius: 8px;
                 color: {c['on_surface']};
                 margin-bottom: 2px;
@@ -221,13 +242,36 @@ class NexusFinder(Gtk.Window):
                 background: {c['primary']};
                 color: #101014;
             }}
+            .action-btn {{
+                background: {c['card_bg']};
+                border: 1px solid {c['border']};
+                border-radius: 8px;
+                color: {c['on_surface']};
+                padding: 8px 12px;
+                font-weight: 600;
+            }}
+            .action-btn:hover {{
+                background: {c['primary']};
+                color: #101014;
+            }}
+            .share-btn {{
+                background: {c['secondary']};
+                border: none;
+                border-radius: 8px;
+                color: #101014;
+                font-weight: bold;
+                padding: 8px 12px;
+            }}
+            .share-btn:hover {{
+                background: {c['primary']};
+            }}
             .search-entry {{
                 background-color: {c['card_bg']};
                 border: 1px solid {c['border']};
                 border-radius: 8px;
                 color: {c['on_surface']};
                 padding: 6px 12px;
-                min-width: 220px;
+                min-width: 200px;
             }}
             .search-entry:focus {{
                 border-color: {c['primary']};
@@ -236,21 +280,8 @@ class NexusFinder(Gtk.Window):
                 background-color: {c['sidebar_bg']};
                 border-left: 1px solid {c['border']};
                 padding: 14px;
-                min-width: 260px;
-            }}
-            .file-row {{
-                padding: 6px 10px;
-                border-radius: 6px;
-                margin: 1px 4px;
-                color: {c['on_surface']};
-            }}
-            .file-row:hover {{
-                background-color: {c['hover_bg']};
-            }}
-            .file-row:selected {{
-                background-color: {c['primary']};
-                color: #101014;
-                font-weight: bold;
+                min-width: 270px;
+                max-width: 320px;
             }}
             .status-bar {{
                 background-color: {c['sidebar_bg']};
@@ -330,7 +361,7 @@ class NexusFinder(Gtk.Window):
         sidebar_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
         sidebar_box.get_style_context().add_class("sidebar")
 
-        # Category: Favorites
+        # Category: Favorites & Workspaces
         lbl_fav = Gtk.Label(label="FAVORITES", xalign=0)
         lbl_fav.get_style_context().add_class("sidebar-category")
         sidebar_box.pack_start(lbl_fav, False, False, 0)
@@ -366,7 +397,42 @@ class NexusFinder(Gtk.Window):
                 sidebar_box.pack_start(btn, False, False, 0)
                 self.sidebar_buttons.append(btn)
 
-        # Category: Places / System
+        # Category: Client Projects & Deliveries
+        lbl_clients = Gtk.Label(label="CLIENTS & DELIVERY", xalign=0)
+        lbl_clients.get_style_context().add_class("sidebar-category")
+        sidebar_box.pack_start(lbl_clients, False, False, 0)
+
+        client_dirs = [
+            ("📦 Sapphire Delivery", "/srv/sapphire/customercodes/Fiverr"),
+            ("💼 Customer Codes", "/srv/sapphire"),
+        ]
+        for name, path in client_dirs:
+            if os.path.isdir(path):
+                btn = Gtk.Button(label=name)
+                btn.set_alignment(0, 0.5)
+                btn.get_style_context().add_class("sidebar-item")
+                btn.target_path = path
+                btn.connect("clicked", lambda w: self.navigate_to(w.target_path))
+                sidebar_box.pack_start(btn, False, False, 0)
+                self.sidebar_buttons.append(btn)
+
+        # Category: Remote SSH Servers (SSHFS Mount on Click)
+        ssh_hosts = parse_ssh_hosts()
+        if ssh_hosts:
+            lbl_servers = Gtk.Label(label="REMOTE SERVERS", xalign=0)
+            lbl_servers.get_style_context().add_class("sidebar-category")
+            sidebar_box.pack_start(lbl_servers, False, False, 0)
+
+            for host in ssh_hosts[:6]:
+                btn = Gtk.Button(label=f"🌐 {host}")
+                btn.set_alignment(0, 0.5)
+                btn.get_style_context().add_class("sidebar-item")
+                btn.ssh_host = host
+                btn.connect("clicked", self.on_mount_ssh_server)
+                sidebar_box.pack_start(btn, False, False, 0)
+                self.sidebar_buttons.append(btn)
+
+        # Category: System
         lbl_places = Gtk.Label(label="SYSTEM", xalign=0)
         lbl_places.get_style_context().add_class("sidebar-category")
         sidebar_box.pack_start(lbl_places, False, False, 0)
@@ -400,6 +466,15 @@ class NexusFinder(Gtk.Window):
         self.treeview.connect("row-activated", self.on_item_double_clicked)
         self.treeview.connect("button-press-event", self.on_treeview_button_press)
         self.treeview.get_selection().connect("changed", self.on_selection_changed)
+
+        # --- Enable Native Drag & Drop (Drag into Browser / Discord / Telegram) ---
+        target_entry = Gtk.TargetEntry.new("text/uri-list", Gtk.TargetFlags.OTHER_APP, 0)
+        self.treeview.enable_model_drag_source(
+            Gdk.ModifierType.BUTTON1_MASK,
+            [target_entry],
+            Gdk.DragAction.COPY | Gdk.DragAction.MOVE
+        )
+        self.treeview.connect("drag-data-get", self.on_drag_data_get)
 
         # Column 1: Name with Icon
         col_name = Gtk.TreeViewColumn("Name")
@@ -451,16 +526,28 @@ class NexusFinder(Gtk.Window):
         self.lbl_item_meta.set_line_wrap(True)
         self.preview_box.pack_start(self.lbl_item_meta, False, False, 0)
 
-        # Action Buttons
+        # Client / Sharing Action Box
         actions_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         
+        # 1-Click Quick Share Link (Direct Link for Fiverr/Clients)
+        btn_share_link = Gtk.Button(label="🚀 Quick Share Link (Copy URL)")
+        btn_share_link.get_style_context().add_class("share-btn")
+        btn_share_link.connect("clicked", self.on_upload_and_share_link)
+        actions_box.pack_start(btn_share_link, False, False, 0)
+
+        # Package for Delivery Zip
+        btn_pkg_delivery = Gtk.Button(label="📦 Package for Delivery (.zip)")
+        btn_pkg_delivery.get_style_context().add_class("action-btn")
+        btn_pkg_delivery.connect("clicked", self.on_package_for_delivery)
+        actions_box.pack_start(btn_pkg_delivery, False, False, 0)
+
         btn_open = Gtk.Button(label="󰅩 Open Default App")
-        btn_open.get_style_context().add_class("nav-btn")
+        btn_open.get_style_context().add_class("action-btn")
         btn_open.connect("clicked", self.on_open_selected)
         actions_box.pack_start(btn_open, False, False, 0)
 
-        btn_copy_path = Gtk.Button(label="📋 Copy Absolute Path")
-        btn_copy_path.get_style_context().add_class("nav-btn")
+        btn_copy_path = Gtk.Button(label="📋 Copy Path")
+        btn_copy_path.get_style_context().add_class("action-btn")
         btn_copy_path.connect("clicked", self.on_copy_selected_path)
         actions_box.pack_start(btn_copy_path, False, False, 0)
 
@@ -470,6 +557,120 @@ class NexusFinder(Gtk.Window):
         scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         scrolled.add(self.preview_box)
         return scrolled
+
+    # -------------------------------------------------------------------------
+    # Drag & Drop Handler (Drop to Firefox, Discord, Fiverr Chat)
+    # -------------------------------------------------------------------------
+    def on_drag_data_get(self, treeview, context, selection_data, info, time):
+        model, iter_ = treeview.get_selection().get_selected()
+        if iter_:
+            full_path = model.get_value(iter_, 5)
+            uri = f"file://{urllib.parse.quote(full_path)}"
+            selection_data.set_uris([uri])
+
+    # -------------------------------------------------------------------------
+    # SSHFS Server Mounting
+    # -------------------------------------------------------------------------
+    def on_mount_ssh_server(self, btn):
+        host = btn.ssh_host
+        mount_dir = os.path.expanduser(f"~/Remote/{host}")
+        os.makedirs(mount_dir, exist_ok=True)
+
+        # Check if already mounted
+        res = subprocess.run(["mountpoint", "-q", mount_dir])
+        if res.returncode != 0:
+            # Mount via SSHFS
+            self.status_label.set_text(f"Connecting to {host} via SSHFS...")
+            cmd = ["sshfs", "-o", "reconnect,ServerAliveInterval=15", f"{host}:/", mount_dir]
+            mount_proc = subprocess.run(cmd)
+            if mount_proc.returncode == 0:
+                subprocess.Popen(["notify-send", "-a", "Nexus Finder", "-i", "network-server", "🌐 Server gemountet", f"{host} ist bereit unter ~/Remote/{host}"])
+            else:
+                self.status_label.set_text(f"⚠️ SSHFS Connection Failed for {host}")
+                return
+
+        self.navigate_to(mount_dir)
+
+    # -------------------------------------------------------------------------
+    # Client Delivery & 1-Click Share Engine
+    # -------------------------------------------------------------------------
+    def on_upload_and_share_link(self, w):
+        if not hasattr(self, 'selected_path') or not self.selected_path:
+            return
+
+        target = self.selected_path
+        if os.path.isdir(target):
+            # If folder, create temporary zip first
+            zip_dest = f"/tmp/{os.path.basename(target)}.zip"
+            shutil.make_archive(f"/tmp/{os.path.basename(target)}", 'zip', target)
+            upload_target = zip_dest
+        else:
+            upload_target = target
+
+        self.status_label.set_text(f"Uploading {os.path.basename(upload_target)} for public share link...")
+        subprocess.Popen(["notify-send", "-a", "Nexus Share", "-i", "network-transmit-receive", "🚀 Upload gestartet...", f"Lade {os.path.basename(upload_target)} hoch"])
+
+        def upload_thread():
+            try:
+                # Fast upload via 0x0.st / tmpfiles.org
+                curl_cmd = ["curl", "-s", "-F", f"file=@{upload_target}", "https://0x0.st"]
+                res = subprocess.run(curl_cmd, capture_output=True, text=True, timeout=30)
+                url = res.stdout.strip()
+                if url.startswith("http"):
+                    # Copy to clipboard
+                    clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+                    clipboard.set_text(url, -1)
+                    
+                    if which_cmd := shutil.which("canberra-gtk-play"):
+                        subprocess.Popen([which_cmd, "-i", "complete"])
+                        
+                    subprocess.Popen([
+                        "notify-send",
+                        "-a", "Nexus Share",
+                        "-i", "edit-paste",
+                        "-t", "3000",
+                        "📋 Direkter Download-Link kopiert!",
+                        f"{url}\n(Bereit zum Einfügen im Fiverr/Discord Chat)"
+                    ])
+                    GLib.idle_add(lambda: self.status_label.set_text(f"Share URL: {url}"))
+                else:
+                    GLib.idle_add(lambda: self.status_label.set_text("Upload failed"))
+            except Exception as e:
+                GLib.idle_add(lambda: self.status_label.set_text(f"Upload error: {e}"))
+
+        threading.Thread(target=upload_thread, daemon=True).start()
+
+    def on_package_for_delivery(self, w):
+        if not hasattr(self, 'selected_path') or not self.selected_path:
+            return
+
+        target = self.selected_path
+        base_name = os.path.basename(target)
+        delivery_folder = os.path.join(self.current_path, "delivery")
+        os.makedirs(delivery_folder, exist_ok=True)
+        
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M")
+        zip_output = os.path.join(delivery_folder, f"{base_name}_Delivery_{timestamp}")
+
+        try:
+            if os.path.isdir(target):
+                shutil.make_archive(zip_output, 'zip', target)
+            else:
+                dest_file = os.path.join(delivery_folder, base_name)
+                shutil.copy2(target, dest_file)
+                zip_output = dest_file
+
+            subprocess.Popen([
+                "notify-send",
+                "-a", "Nexus Delivery",
+                "-i", "package-x-generic",
+                "-t", "2500",
+                "📦 Übergabe-Paket erstellt!",
+                f"Gespeichert in: delivery/\nBereit für den Kunden!"
+            ])
+            self.load_directory(self.current_path)
+        except Exception as e:
+            self.status_label.set_text(f"Delivery pack error: {e}")
 
     # -------------------------------------------------------------------------
     # Directory Loading & Navigation
@@ -659,17 +860,28 @@ class NexusFinder(Gtk.Window):
         item_open.connect("activate", lambda w: subprocess.Popen(["xdg-open", path]))
         menu.append(item_open)
 
+        item_share = Gtk.MenuItem(label="🚀 1-Click Quick Share Link (Upload & Copy URL)")
+        item_share.connect("activate", lambda w: self.on_upload_and_share_link(None))
+        menu.append(item_share)
+
+        item_pkg = Gtk.MenuItem(label="📦 Package for Delivery (Save in delivery/)")
+        item_pkg.connect("activate", lambda w: self.on_package_for_delivery(None))
+        menu.append(item_pkg)
+
+        item_sep1 = Gtk.SeparatorMenuItem()
+        menu.append(item_sep1)
+
         item_term = Gtk.MenuItem(label=" Open in Kitty Terminal")
         dir_to_open = path if os.path.isdir(path) else os.path.dirname(path)
         item_term.connect("activate", lambda w: subprocess.Popen(["kitty", "--directory", dir_to_open]))
         menu.append(item_term)
 
-        item_copy = Gtk.MenuItem(label="📋 Copy Path")
+        item_copy = Gtk.MenuItem(label="📋 Copy Absolute Path")
         item_copy.connect("activate", lambda w: self.copy_to_clipboard(path))
         menu.append(item_copy)
 
-        item_sep = Gtk.SeparatorMenuItem()
-        menu.append(item_sep)
+        item_sep2 = Gtk.SeparatorMenuItem()
+        menu.append(item_sep2)
 
         item_rename = Gtk.MenuItem(label="✏️ Rename")
         item_rename.connect("activate", lambda w: self.on_rename_dialog(path))
