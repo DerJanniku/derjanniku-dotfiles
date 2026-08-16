@@ -13,13 +13,14 @@ ConfirmClosingMultipleTabs=false
 GlobalViewProps=true
 OpenExternallyCalledFolderInNewTab=true
 RememberOpenedTabs=false
-ShowFullPath=false
+ShowFullPath=true
 ShowFullPathInTitlebar=true
 ShowInformationPanel=false
 ShowSelectionToggle=false
 ShowStatusBar=true
+TerminalApplication=kitty
 Version=202
-ViewPropsTimestamp=2026,8,16,15,26,00.0
+ViewPropsTimestamp=2026,8,16,15,37,00.0
 
 [IconsMode]
 IconSize=64
@@ -45,7 +46,7 @@ ToolButtonStyle=IconOnly
 IconSize=22
 
 [PreviewSettings]
-Plugins=appimagethumbnail,audiothumbnail,comicbookthumbnail,cursorthumbnail,djvuthumbnail,ebookthumbnail,exrthumbnail,imagethumbnail,jpegthumbnail,kraorathumbnail,windowsexethumbnail,windowsimagethumbnail,opendocumentthumbnail,svgthumbnail,ffmpegthumbs,fontthumbnail
+Plugins=ffmpegthumbnailer,appimagethumbnail,audiothumbnail,avif,blenderthumbnail,comicbookthumbnail,cursorthumbnail,djvuthumbnail,ebookthumbnail,exrthumbnail,directorythumbnail,fontthumbnail,heif,imagethumbnail,jpegthumbnail,jxl,kraorathumbnail,windowsexethumbnail,windowsimagethumbnail,mobithumbnail,opendocumentthumbnail,gsthumbnail,rawthumbnail,librsvg,svgthumbnail,ffmpegthumbs,gdk-pixbuf-thumbnailer,gsf-office
 
 [Toolbar mainToolBar]
 ToolButtonStyle=IconOnly
