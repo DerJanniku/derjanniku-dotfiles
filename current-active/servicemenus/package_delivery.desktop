@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Service
+MimeType=inode/directory;all/allfiles;
+Actions=PackageDelivery;
+X-KDE-Priority=TopLevel
+
+[Desktop Action PackageDelivery]
+Name=📦 Für Kunden packen (in delivery/ .zip)
+Name[de]=📦 Für Kunden packen (in delivery/ .zip)
+Icon=package-x-generic
+Exec=bash -c 'DIR=$(dirname "%f"); BASE=$(basename "%f"); OUT_DIR="$DIR/delivery"; mkdir -p "$OUT_DIR"; ZIP="$OUT_DIR/${BASE}_Delivery_$(date +%%Y%%m%%d_%%H%%M).zip"; if [ -d "%f" ]; then (cd "$DIR" && zip -r -q "$ZIP" "$BASE" -x "*.git*" -x "*node_modules*" -x "*.DS_Store*"); else cp "%f" "$OUT_DIR/"; fi; notify-send -a "Delivery" -i package-x-generic "📦 Paket erstellt" "Gespeichert in: $OUT_DIR"'

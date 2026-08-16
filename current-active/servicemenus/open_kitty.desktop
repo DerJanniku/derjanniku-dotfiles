@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Service
+MimeType=inode/directory;
+Actions=OpenKittyHere;
+X-KDE-Priority=TopLevel
+
+[Desktop Action OpenKittyHere]
+Name= In Kitty Terminal öffnen
+Name[de]= In Kitty Terminal öffnen
+Icon=terminal
+Exec=kitty --directory "%f"

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Service
+MimeType=image/jpeg;image/png;image/webp;image/svg+xml;image/gif;image/bmp;
+Actions=SetAsWallpaper;
+X-KDE-Priority=TopLevel
+X-KDE-Submenu=Wallpaper Actions
+
+[Desktop Action SetAsWallpaper]
+Name=🖼️ Als Wallpaper setzen
+Name[de]=🖼️ Als Wallpaper setzen
+Icon=preferences-desktop-wallpaper
+Exec=bash -c 'awww img "%u" --transition-type wipe --transition-fps 144 && ~/.config/hypr/scripts/theme-matugen.sh "%u"'

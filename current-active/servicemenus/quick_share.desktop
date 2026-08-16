@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Service
+MimeType=application/octet-stream;all/allfiles;
+Actions=QuickShare;
+X-KDE-Priority=TopLevel
+
+[Desktop Action QuickShare]
+Name=🚀 Quick Share Link (Upload & URL kopieren)
+Name[de]=🚀 Quick Share Link (Upload & URL kopieren)
+Icon=network-transmit-receive
+Exec=bash -c 'notify-send -a "Share" -i network-transmit-receive "🚀 Upload..." "Lade %n hoch..."; URL=$(curl -s -F "file=@%f" https://0x0.st); if [[ "$URL" =~ ^http ]]; then echo -n "$URL" | wl-copy; canberra-gtk-play -i complete 2>/dev/null || true; notify-send -a "Share" -i edit-paste -t 3000 "📋 Link kopiert!" "$URL"; else notify-send -a "Share" -i dialog-error "Fehler" "Upload fehlgeschlagen"; fi'
