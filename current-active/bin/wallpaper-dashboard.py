@@ -15,21 +15,35 @@ WALLPAPER_DIR = os.path.expanduser("~/Pictures/wallpapers")
 CACHE_DIR = os.path.expanduser("~/.cache/wallpaper_thumbs")
 os.makedirs(CACHE_DIR, exist_ok=True)
 
-# STRIKTE WHITELIST der Ordner
-ALLOWED_FOLDERS = ["cold", "aerial", "anime", "animated", "00_favourite", "00_master"]
+# STRIKTE WHITELIST der Ordner (erweitert um dynamische Entdeckung)
+DEFAULT_FOLDERS = ["cold", "aerial", "anime", "animated", "00_favourite", "00_master"]
 
 def normalize(text):
     return re.sub(r'[-_\s]', '', text).lower()
 
 def get_wallpapers_grouped():
     groups = {}
-    for folder in ALLOWED_FOLDERS:
+    
+    # 1. Check all subdirectories in WALLPAPER_DIR
+    if os.path.isdir(WALLPAPER_DIR):
+        existing_subdirs = [d for d in os.listdir(WALLPAPER_DIR) if os.path.isdir(os.path.join(WALLPAPER_DIR, d)) and not d.startswith('.')]
+        all_folders = sorted(list(set(DEFAULT_FOLDERS + existing_subdirs)))
+    else:
+        all_folders = DEFAULT_FOLDERS
+
+    for folder in all_folders:
         full_path = os.path.join(WALLPAPER_DIR, folder)
         if os.path.isdir(full_path):
-            valid_files = [f for f in os.listdir(full_path) if f.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.mp4'))]
+            valid_files = [f for f in os.listdir(full_path) if f.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.gif', '.mp4'))]
             if valid_files:
                 valid_files.sort(key=lambda x: (not x.startswith("00"), x.lower()))
                 groups[folder] = [os.path.join(full_path, f) for f in valid_files]
+                
+    # Root Pictures folder check
+    root_pics = [os.path.join(os.path.expanduser("~/Pictures"), f) for f in os.listdir(os.path.expanduser("~/Pictures")) if f.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.gif'))]
+    if root_pics:
+        groups["Custom"] = sorted(root_pics)
+
     return sorted(groups.keys(), key=lambda x: (not x.startswith("00"), x.lower())), groups
 
 class HyprDashboard(Gtk.Window):
@@ -100,37 +114,53 @@ class HyprDashboard(Gtk.Window):
 
     def on_row_selected(self, lb, row):
         if row and hasattr(row, 'wp_path'):
-            pix = GdkPixbuf.Pixbuf.new_from_file_at_scale(row.wp_path, 720, 500, True)
-            self.preview_image.set_from_pixbuf(pix)
+            try:
+                pix = GdkPixbuf.Pixbuf.new_from_file_at_scale(row.wp_path, 720, 500, True)
+                self.preview_image.set_from_pixbuf(pix)
+            except Exception:
+                self.preview_image.clear()
 
     def on_row_activated(self, lb, row):
         if not row or not hasattr(row, 'wp_path'): return
         wp = row.wp_path
         
-        # Prüfe ob der Daemon läuft
-        daemon_running = subprocess.run(["pgrep", "swww-daemon"], capture_output=True).returncode == 0
+        # Check backend tool availability
+        has_awww = subprocess.run(["which", "awww"], capture_output=True).returncode == 0
+        has_swww = subprocess.run(["which", "swww"], capture_output=True).returncode == 0
         
         if wp.lower().endswith('.mp4'):
-            subprocess.run(["killall", "swww-daemon", "hyprpaper", "mpvpaper"], capture_output=True)
+            subprocess.run(["killall", "awww-daemon", "swww-daemon", "hyprpaper", "mpvpaper"], capture_output=True)
             if subprocess.run(["which", "mpvpaper"], capture_output=True).returncode == 0:
                 subprocess.Popen(["mpvpaper", "-o", "no-audio --loop-playlist", "*", wp])
-            else:
+            elif has_awww:
+                subprocess.Popen(["awww-daemon"])
+                import time; time.sleep(0.3)
+                subprocess.Popen(["awww", "img", wp, "--transition-type", "grow"])
+            elif has_swww:
                 subprocess.Popen(["swww-daemon", "--format", "argb"])
                 import time; time.sleep(0.3)
                 subprocess.Popen(["swww", "img", wp, "--transition-type", "grow"])
         else:
-            # Falls Video lief, beenden
-            subprocess.run(["killall", "hyprpaper", "mpvpaper"], capture_output=True)
+            # Stop video wallpaper daemon if running
+            subprocess.run(["killall", "mpvpaper", "hyprpaper"], capture_output=True)
             
-            # Nur neu starten wenn nötig
-            if not daemon_running:
-                subprocess.Popen(["swww-daemon", "--format", "argb"])
-                import time; time.sleep(0.3)
-            
-            subprocess.Popen(["swww", "img", wp, "--transition-type", "grow", "--transition-fps", "144"])
+            if has_awww:
+                # Ensure awww-daemon is running
+                if subprocess.run(["pgrep", "-x", "awww-daemon"], capture_output=True).returncode != 0:
+                    subprocess.Popen(["awww-daemon"])
+                    import time; time.sleep(0.3)
+                subprocess.Popen(["awww", "img", wp, "--transition-type", "grow", "--transition-fps", "144"])
+            elif has_swww:
+                if subprocess.run(["pgrep", "-x", "swww-daemon"], capture_output=True).returncode != 0:
+                    subprocess.Popen(["swww-daemon", "--format", "argb"])
+                    import time; time.sleep(0.3)
+                subprocess.Popen(["swww", "img", wp, "--transition-type", "grow", "--transition-fps", "144"])
         
-        # Update system memory/theme
+        # Update system symlink
         subprocess.run(f"ln -sf '{wp}' $HOME/.config/hypr/wallpaper.jpg", shell=True)
+        
+        # Trigger dynamic Material You theming
+        subprocess.Popen(["bash", os.path.expanduser("~/.config/hypr/scripts/theme-matugen.sh"), wp])
         
         # Memory Update
         try:
@@ -140,7 +170,8 @@ class HyprDashboard(Gtk.Window):
             if os.path.isdir(theme_path):
                 with open(os.path.join(theme_path, "last_wallpaper.txt"), "w") as f:
                     f.write(wp)
-        except: pass
+        except Exception:
+            pass
         
         Gtk.main_quit()
 

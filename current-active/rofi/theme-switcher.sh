@@ -37,7 +37,15 @@ if [ -n "$SELECTED" ]; then
     fi
 
     if [ -f "$WP_PATH" ]; then
-        swww img "$WP_PATH" --transition-type grow --transition-pos center --transition-duration 2
+        if which awww >/dev/null 2>&1; then
+            pgrep -x awww-daemon >/dev/null 2>&1 || awww-daemon &
+            sleep 0.2
+            awww img "$WP_PATH" --transition-type grow --transition-pos center --transition-duration 2
+        elif which swww >/dev/null 2>&1; then
+            pgrep -x swww-daemon >/dev/null 2>&1 || swww-daemon --format argb &
+            sleep 0.2
+            swww img "$WP_PATH" --transition-type grow --transition-pos center --transition-duration 2
+        fi
         ln -sf "$WP_PATH" "$HOME/.config/hypr/wallpaper.jpg"
     fi
 

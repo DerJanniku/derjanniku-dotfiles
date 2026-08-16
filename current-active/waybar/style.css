@@ -1,80 +1,159 @@
+@import url("colors.css");
+
 * {
     border: none;
     border-radius: 0;
-    font-family: "JetBrainsMono Nerd Font", "Roboto", "Helvetica", "Arial", sans-serif;
+    font-family: "JetBrainsMono Nerd Font", "Roboto", sans-serif;
     font-size: 11px;
     font-weight: 700;
     min-height: 0;
 }
 
 window#waybar {
-    background-color: rgba(26, 27, 38, 0.85); /* Glassy Blue */
-    border: 1px solid rgba(122, 162, 247, 0.2);
-    border-radius: 16px;
-    color: #c0caf5;
-    margin: 8px 20px;
+    background-color: transparent;
+    color: @on_surface;
 }
 
+/* ==============================================================================
+   Floating Pill Islands (Glassmorphism + Subtle Border Glow)
+   ============================================================================== */
+
+.modules-left,
+.modules-center,
+.modules-right {
+    background: rgba(18, 19, 26, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 14px;
+    padding: 3px 8px;
+    margin: 4px 6px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* --- Arch Logo Pill --- */
+#custom-arch {
+    color: @primary;
+    font-size: 14px;
+    padding: 0 8px 0 2px;
+    margin-right: 4px;
+}
+
+/* --- Workspaces --- */
 #workspaces {
-    background: rgba(122, 162, 247, 0.05);
-    margin: 4px;
-    border-radius: 12px;
-    padding: 0 4px;
+    background: transparent;
+    padding: 0;
 }
 
 #workspaces button {
-    padding: 0px 8px;
-    color: #7aa2f7;
-    border-radius: 50%;
-    margin: 0px 4px;
+    padding: 2px 7px;
+    color: @on_surface;
+    background: transparent;
+    border-radius: 8px;
+    margin: 0 2px;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 #workspaces button.active {
-    background-color: #7aa2f7;
-    color: #1a1b26;
+    background-color: @primary;
+    color: #12131a;
+    font-weight: 800;
+    box-shadow: 0 0 10px @primary;
 }
 
 #workspaces button:hover {
-    background-color: rgba(122, 162, 247, 0.1);
+    background-color: rgba(255, 255, 255, 0.15);
 }
 
+#workspaces button.urgent {
+    background-color: #f7768e;
+    color: #ffffff;
+}
+
+/* --- Window Title --- */
 #window {
-    font-weight: bold;
-    color: #c0caf5;
-    margin-left: 10px;
+    color: @on_surface;
+    margin-left: 8px;
+    padding: 0 6px;
     font-size: 10px;
+    opacity: 0.85;
 }
 
-#clock, #cpu, #memory, #network, #pulseaudio, #tray, #custom-music, #custom-power {
-    padding: 0 12px;
-    color: #c0caf5;
-    background: transparent;
-    margin: 0px;
-    font-weight: 600;
+/* --- Center Island: Cava + MPRIS --- */
+#custom-cava {
+    color: @primary;
+    font-size: 12px;
+    padding: 0 8px;
+    letter-spacing: -1px;
 }
 
-#custom-music {
-    color: #9ece6a;
-    font-size: 10px;
+#mpris {
+    color: @secondary;
+    padding: 0 10px;
+    border-radius: 8px;
+}
+
+#mpris:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* --- Right Modules --- */
+#pulseaudio,
+#network,
+#cpu,
+#memory,
+#clock,
+#tray,
+#custom-power {
+    padding: 0 8px;
+    color: @on_surface;
+    margin: 0 2px;
+}
+
+#pulseaudio {
+    color: @primary;
+}
+
+#network {
+    color: @secondary;
+}
+
+#cpu, #memory {
+    color: @tertiary;
 }
 
 #clock {
-    color: #7dcfff;
+    color: @primary;
+    font-weight: 800;
+}
+
+#custom-gamemode {
+    padding: 0;
+    margin: 0;
+    font-size: 0px;
+}
+
+#custom-gamemode.active {
+    background: #f7768e;
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 2px 8px;
+    margin: 0 4px;
+    font-size: 11px;
+    font-weight: 800;
 }
 
 #custom-power {
     color: #f7768e;
-    font-size: 14px;
-    margin-right: 10px;
-    padding-left: 10px;
+    font-size: 13px;
+    padding: 0 6px;
+    margin-left: 4px;
+    border-radius: 6px;
 }
 
 #custom-power:hover {
-    background: #f7768e;
+    background-color: #f7768e;
     color: #ffffff;
-    border-radius: 50%;
 }
 
 #tray {
-    padding: 0 8px;
+    padding: 0 6px;
 }
