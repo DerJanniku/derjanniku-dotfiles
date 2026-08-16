@@ -30,8 +30,8 @@ disable_gamemode() {
         keyword decoration:shadow:enabled 1;\
         keyword decoration:blur:enabled 0;\
         keyword decoration:rounding 15;\
-        keyword decoration:active_opacity 0.98;\
-        keyword decoration:inactive_opacity 0.90;\
+        keyword decoration:active_opacity 1.0;\
+        keyword decoration:inactive_opacity 1.0;\
         keyword general:gaps_in 6;\
         keyword general:gaps_out 12;\
         keyword general:border_size 3;\
