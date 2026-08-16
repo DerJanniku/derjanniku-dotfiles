@@ -1,0 +1,63 @@
+@import "colors.rasi"
+
+configuration {
+    show-icons: false;
+}
+
+window {
+    width: 650px;
+    border: 2px;
+    border-color: @accent;
+    border-radius: 14px;
+    background-color: @bg;
+    padding: 12px;
+}
+
+mainbox {
+    background-color: transparent;
+    children: [ "inputbar", "listview" ];
+    spacing: 8px;
+}
+
+inputbar {
+    background-color: @surface;
+    border-radius: 8px;
+    padding: 8px 12px;
+    children: [ "prompt", "entry" ];
+}
+
+prompt {
+    text-color: @accent;
+    background-color: transparent;
+}
+
+entry {
+    text-color: @fg;
+    background-color: transparent;
+    placeholder: "Clipboard suchen...";
+    placeholder-color: rgba(255, 255, 255, 0.4);
+}
+
+listview {
+    lines: 10;
+    scrollbar: false;
+    background-color: transparent;
+    spacing: 4px;
+}
+
+element {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background-color: transparent;
+    text-color: @fg;
+}
+
+element selected.normal {
+    background-color: @accent;
+    text-color: #11111b;
+}
+
+element-text {
+    background-color: transparent;
+    text-color: inherit;
+}

@@ -4,15 +4,13 @@
 # Author: DerJannik
 # ==============================================================================
 
-# Prompt via Rofi with styled Maccy window
-ROFI_THEME='window { width: 680px; border: 2px solid @accent; border-radius: 14px; background-color: rgba(20, 20, 30, 0.92); }
-            mainbox { padding: 12px; }
-            inputbar { margin-bottom: 8px; }
-            listview { lines: 12; scrollbar: false; }
-            element { padding: 8px 12px; border-radius: 8px; }
-            element selected { background-color: @accent; color: #11111b; }'
+THEME_FILE="$HOME/.config/rofi/clipboard.rasi"
 
-SELECTION=$(cliphist list | rofi -dmenu -i -p "📋 Maccy Clipboard" -theme-str "$ROFI_THEME")
+if [ -f "$THEME_FILE" ]; then
+    SELECTION=$(cliphist list | rofi -dmenu -i -p "📋 Maccy" -theme "$THEME_FILE")
+else
+    SELECTION=$(cliphist list | rofi -dmenu -i -p "📋 Maccy")
+fi
 
 if [ -n "$SELECTION" ]; then
     if [[ "$SELECTION" == *":clear"* ]] || [[ "$SELECTION" == *"Wipe History"* ]]; then
