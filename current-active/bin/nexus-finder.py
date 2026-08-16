@@ -3,17 +3,6 @@
 ==============================================================================
 Nexus Finder 2.0 - Ultimate Bespoke File Manager for Arch Linux & Hyprland
 Author: DerJannik
-Features:
-  - Multi-Tab Support (Ctrl+T, Ctrl+W)
-  - Full Cut/Copy/Paste/Duplicate (Ctrl+C, Ctrl+X, Ctrl+V, Ctrl+D)
-  - Direct Path URL Input Bar (Ctrl+L) with Tab Completion
-  - Live Code/Text, Image & Archive Previews in Detail Inspector
-  - Dynamic Material You / Wallpaper Theming
-  - SSHFS 1-Click Server Mounts & Remote Browsing
-  - 1-Click Client Delivery Packaging & 0x0.st Quick Share Links
-  - Built-in Archive Extract / Compress (.zip, .tar.gz, .jar, .7z)
-  - Git Branch & Status Detection in Status Bar
-  - Native Drag & Drop to Firefox, Discord, Terminal & Folders
 ==============================================================================
 """
 
@@ -32,7 +21,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
 gi.require_version('GdkPixbuf', '2.0')
-from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, Pango, GObject
+from gi.repository import Gtk, Gdk, GdkPixbuf, GLib, Pango
 
 # -----------------------------------------------------------------------------
 # Dynamic Color Palette
@@ -134,7 +123,6 @@ def get_git_branch(path):
     try:
         res = subprocess.run(["git", "-C", path, "branch", "--show-current"], capture_output=True, text=True, timeout=1)
         if res.returncode == 0 and res.stdout.strip():
-            # Check dirty
             dirty_res = subprocess.run(["git", "-C", path, "status", "--porcelain"], capture_output=True, text=True, timeout=1)
             dirty = "*" if dirty_res.stdout.strip() else ""
             return f"󰊢 {res.stdout.strip()}{dirty}"
@@ -156,9 +144,8 @@ class NexusFinder(Gtk.Window):
         self.icon_theme = Gtk.IconTheme.get_default()
         self.show_hidden = False
         self.search_filter = ""
-        self.internal_clipboard = {"action": None, "paths": []} # Cut / Copy
+        self.internal_clipboard = {"action": None, "paths": []}
 
-        # Tab Support: List of tab dicts { 'path': str, 'history': [], 'idx': int }
         initial_dir = os.path.abspath(initial_path or os.path.expanduser("~"))
         self.tabs_data = []
 
@@ -343,7 +330,6 @@ class NexusFinder(Gtk.Window):
         hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         hbox.get_style_context().add_class("header-bar")
 
-        # History Buttons
         self.btn_back = Gtk.Button(label="󰁍")
         self.btn_back.get_style_context().add_class("nav-btn")
         self.btn_back.connect("clicked", self.on_back_clicked)
@@ -359,7 +345,6 @@ class NexusFinder(Gtk.Window):
         self.btn_up.connect("clicked", lambda w: self.navigate_current_tab(os.path.dirname(self.get_active_tab_path())))
         hbox.pack_start(self.btn_up, False, False, 0)
 
-        # Breadcrumbs Stack (Breadcrumb buttons OR Direct Text Entry)
         self.path_stack = Gtk.Stack()
         
         self.breadcrumb_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
@@ -373,21 +358,18 @@ class NexusFinder(Gtk.Window):
 
         hbox.pack_start(self.path_stack, True, True, 6)
 
-        # New Tab Button
         btn_tab = Gtk.Button(label="󰝰+")
         btn_tab.get_style_context().add_class("nav-btn")
         btn_tab.set_tooltip_text("New Tab (Ctrl+T)")
         btn_tab.connect("clicked", lambda w: self.add_tab(self.get_active_tab_path()))
         hbox.pack_end(btn_tab, False, False, 0)
 
-        # Search Bar
         self.search_entry = Gtk.Entry()
         self.search_entry.get_style_context().add_class("search-entry")
         self.search_entry.set_placeholder_text("󰍉 Filter...")
         self.search_entry.connect("changed", self.on_search_changed)
         hbox.pack_end(self.search_entry, False, False, 0)
 
-        # Quick Actions
         btn_term = Gtk.Button(label="")
         btn_term.get_style_context().add_class("nav-btn")
         btn_term.set_tooltip_text("Open Kitty in folder (Ctrl+T)")
@@ -413,35 +395,29 @@ class NexusFinder(Gtk.Window):
     # -------------------------------------------------------------------------
     def add_tab(self, path):
         target_path = os.path.abspath(path)
-        tab_idx = len(self.tabs_data)
-        
         tab_info = {
             "path": target_path,
             "history": [target_path],
             "history_idx": 0,
-            "selected_path": None
+            "selected_path": None,
+            "sidebar_buttons": []
         }
         self.tabs_data.append(tab_info)
 
-        # Create Tab Content Page
         page_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
         
-        # Sidebar
-        sidebar = self.create_sidebar()
+        sidebar = self.create_sidebar(tab_info)
         page_box.pack_start(sidebar, False, False, 0)
 
-        # File View
         files_view, treeview, liststore = self.create_files_view()
         page_box.pack_start(files_view, True, True, 0)
         tab_info["treeview"] = treeview
         tab_info["liststore"] = liststore
 
-        # Detail/Preview Pane
         preview_pane, preview_widgets = self.create_preview_pane()
         page_box.pack_start(preview_pane, False, False, 0)
         tab_info["preview_widgets"] = preview_widgets
 
-        # Tab Header Label + Close Button
         tab_label_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         tab_title = Gtk.Label(label=os.path.basename(target_path) or "/")
         tab_label_box.pack_start(tab_title, True, True, 0)
@@ -486,7 +462,7 @@ class NexusFinder(Gtk.Window):
     # -------------------------------------------------------------------------
     # Sidebar
     # -------------------------------------------------------------------------
-    def create_sidebar(self):
+    def create_sidebar(self, tab_info):
         sidebar_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
         sidebar_box.get_style_context().add_class("sidebar")
 
@@ -521,8 +497,8 @@ class NexusFinder(Gtk.Window):
                 btn.target_path = path
                 btn.connect("clicked", lambda w: self.navigate_current_tab(w.target_path))
                 sidebar_box.pack_start(btn, False, False, 0)
+                tab_info["sidebar_buttons"].append(btn)
 
-        # Delivery & Customer category
         lbl_clients = Gtk.Label(label="DELIVERY & CLIENTS", xalign=0)
         lbl_clients.get_style_context().add_class("sidebar-category")
         sidebar_box.pack_start(lbl_clients, False, False, 0)
@@ -539,8 +515,8 @@ class NexusFinder(Gtk.Window):
                 btn.target_path = path
                 btn.connect("clicked", lambda w: self.navigate_current_tab(w.target_path))
                 sidebar_box.pack_start(btn, False, False, 0)
+                tab_info["sidebar_buttons"].append(btn)
 
-        # SSHFS Remote Servers
         ssh_hosts = parse_ssh_hosts()
         if ssh_hosts:
             lbl_servers = Gtk.Label(label="REMOTE SERVERS", xalign=0)
@@ -555,7 +531,6 @@ class NexusFinder(Gtk.Window):
                 btn.connect("clicked", self.on_mount_ssh_server)
                 sidebar_box.pack_start(btn, False, False, 0)
 
-        # System
         lbl_places = Gtk.Label(label="SYSTEM", xalign=0)
         lbl_places.get_style_context().add_class("sidebar-category")
         sidebar_box.pack_start(lbl_places, False, False, 0)
@@ -574,6 +549,7 @@ class NexusFinder(Gtk.Window):
                 btn.target_path = path
                 btn.connect("clicked", lambda w: self.navigate_current_tab(w.target_path))
                 sidebar_box.pack_start(btn, False, False, 0)
+                tab_info["sidebar_buttons"].append(btn)
 
         scrolled = Gtk.ScrolledWindow()
         scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
@@ -581,7 +557,7 @@ class NexusFinder(Gtk.Window):
         return scrolled
 
     # -------------------------------------------------------------------------
-    # Files View (Grid & List)
+    # Files View
     # -------------------------------------------------------------------------
     def create_files_view(self):
         liststore = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str, str, bool, str)
@@ -593,7 +569,6 @@ class NexusFinder(Gtk.Window):
         treeview.connect("button-press-event", self.on_treeview_button_press)
         treeview.get_selection().connect("changed", self.on_selection_changed)
 
-        # Enable Drag & Drop to external apps (Firefox/Discord)
         target_entry = Gtk.TargetEntry.new("text/uri-list", Gtk.TargetFlags.OTHER_APP, 0)
         treeview.enable_model_drag_source(
             Gdk.ModifierType.BUTTON1_MASK,
@@ -602,7 +577,6 @@ class NexusFinder(Gtk.Window):
         )
         treeview.connect("drag-data-get", self.on_drag_data_get)
 
-        # Columns
         col_name = Gtk.TreeViewColumn("Name")
         col_name.set_resizable(True)
         col_name.set_min_width(320)
@@ -638,12 +612,10 @@ class NexusFinder(Gtk.Window):
         preview_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         preview_box.get_style_context().add_class("preview-pane")
 
-        # Media Preview / Code Snippet Frame
         preview_image = Gtk.Image()
         preview_image.set_size_request(240, 160)
         preview_box.pack_start(preview_image, False, False, 0)
 
-        # Text/Code Snippet Viewer for text files
         text_scroll = Gtk.ScrolledWindow()
         text_scroll.set_size_request(240, 150)
         text_view = Gtk.TextView()
@@ -653,7 +625,6 @@ class NexusFinder(Gtk.Window):
         text_scroll.add(text_view)
         preview_box.pack_start(text_scroll, False, False, 0)
 
-        # Metadata Labels
         lbl_name = Gtk.Label(label="Select an item", xalign=0)
         lbl_name.set_line_wrap(True)
         lbl_name.get_style_context().add_class("sidebar-category")
@@ -663,7 +634,6 @@ class NexusFinder(Gtk.Window):
         lbl_meta.set_line_wrap(True)
         preview_box.pack_start(lbl_meta, False, False, 0)
 
-        # Quick Actions
         actions_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 
         btn_share_link = Gtk.Button(label="🚀 Quick Share Link (0x0.st)")
@@ -712,15 +682,19 @@ class NexusFinder(Gtk.Window):
         tab["path"] = target_dir
         tab["liststore"].clear()
 
-        # Update Tab Title
         tab_name = os.path.basename(target_dir) or "/"
         tab["tab_title"].set_text(tab_name)
 
-        # Update Breadcrumb Bar & Git Status
+        if "sidebar_buttons" in tab:
+            for btn in tab["sidebar_buttons"]:
+                if hasattr(btn, 'target_path') and os.path.abspath(btn.target_path) == target_dir:
+                    btn.get_style_context().add_class("active")
+                else:
+                    btn.get_style_context().remove_class("active")
+
         self.update_breadcrumbs(target_dir)
         self.update_status_and_git(target_dir)
 
-        # Scan folder items
         try:
             entries = os.listdir(target_dir)
         except PermissionError:
@@ -915,7 +889,6 @@ class NexusFinder(Gtk.Window):
             base = os.path.basename(src)
             dest = os.path.join(dest_dir, base)
 
-            # Avoid overwrite collision by numbering
             counter = 1
             name, ext = os.path.splitext(base)
             while os.path.exists(dest):
@@ -1115,7 +1088,7 @@ class NexusFinder(Gtk.Window):
             pw["text_scroll"].hide()
 
     def on_treeview_button_press(self, treeview, event):
-        if event.button == 3: # Right Click Context Menu
+        if event.button == 3:
             pos = treeview.get_path_at_pos(int(event.x), int(event.y))
             if pos:
                 treeview.get_selection().select_path(pos[0])
@@ -1143,7 +1116,6 @@ class NexusFinder(Gtk.Window):
 
         menu.append(Gtk.SeparatorMenuItem())
 
-        # Archive operations
         if path.endswith((".zip", ".tar.gz", ".tgz", ".jar", ".tar.xz", ".tar")):
             item_extract = Gtk.MenuItem(label="📦 Extract Archive Here")
             item_extract.connect("activate", lambda w: self.on_archive_extract(path))
@@ -1189,7 +1161,10 @@ class NexusFinder(Gtk.Window):
         menu.append(item_delete)
 
         menu.show_all()
-        menu.popup_at_pointer(event)
+        if event and isinstance(event, Gdk.Event):
+            menu.popup_at_pointer(event)
+        else:
+            menu.popup(None, None, None, None, 0, Gtk.get_current_event_time())
 
     def on_open_terminal(self, w):
         subprocess.Popen(["kitty", "--directory", self.get_active_tab_path()])
