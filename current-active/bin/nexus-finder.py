@@ -303,7 +303,6 @@ class NexusFinder(Gtk.Window):
                 border-left: 1px solid {c['border']};
                 padding: 12px;
                 min-width: 280px;
-                max-width: 340px;
             }}
             .status-bar {{
                 background-color: {c['sidebar_bg']};

@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Nexus Finder
+GenericName=File Manager
+Comment=Bespoke Next-Gen File Manager for Arch Linux & Hyprland
+Exec=/home/jannik/.local/bin/nexus-finder %U
+Icon=system-file-manager
+Terminal=false
+Type=Application
+Categories=System;FileTools;FileManager;Utility;Core;
+MimeType=inode/directory;
+Keywords=files;folders;explorer;finder;nexus;manager;dateien;dateimanager;
+StartupNotify=true
+StartupWMClass=NexusFinder
